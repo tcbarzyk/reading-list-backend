@@ -7,6 +7,7 @@ const app = require('../app')
 const api = supertest(app)
 
 const Book = require('../models/book')
+const User = require('../models/user')
 
 beforeEach(async () => {
   await Book.deleteMany({})
@@ -71,7 +72,7 @@ describe('viewing a specific book', () => {
   })
 })
 
-describe ('creating a new book', () => {
+describe('creating a new book', () => {
   test('can create new book', async () => {
     const newBook = {
       key: 'xyz987',
@@ -80,13 +81,16 @@ describe ('creating a new book', () => {
         status: 'has read'
       }
     }
+
+    const token = await helper.userToken()
   
     await api
       .post('/api/books')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBook)
       .expect(201)
       .expect('Content-Type', /application\/json/)
-  
+    
     const booksAtEnd = await helper.booksInDb()
     assert.strictEqual(booksAtEnd.length, helper.initialBooks.length+1)
     const keys = booksAtEnd.map(b => b.key)
@@ -100,9 +104,12 @@ describe ('creating a new book', () => {
         notes: 'This book has no status'
       }
     }
+
+    const token = await helper.userToken()
   
     const addedBook = await api
       .post('/api/books')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBook)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -117,9 +124,12 @@ describe ('creating a new book', () => {
     const newBook = {
       key: "ghi567"
     }
+
+    const token = await helper.userToken()
   
     const addedBook = await api
       .post('/api/books')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBook)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -138,9 +148,12 @@ describe ('creating a new book', () => {
         status: 'reading'
       }
     }
+
+    const token = await helper.userToken()
   
     await api
       .post('/api/books')
+      .set('Authorization', `Bearer ${token}`)
       .send(newBook)
       .expect(400)
     
@@ -154,8 +167,11 @@ describe('deleting a book', () => {
     const booksAtStart = await helper.booksInDb()
     const bookToDelete = booksAtStart[0]
 
+    const token = await helper.userToken()
+
     await api
       .delete(`/api/books/${booksAtStart[0].id}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(204)
     
     const booksAtEnd = await helper.booksInDb()
@@ -178,8 +194,11 @@ describe('updating a book', () => {
       }
     }
 
+    const token = await helper.userToken()
+
     await api
       .put(`/api/books/${booksAtStart[0].id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(updatedBookInfo)
       .expect(200)
       .expect('Content-Type', /application\/json/)
@@ -201,8 +220,11 @@ describe('updating a book', () => {
       key: '1234567890'
     }
 
+    const token = await helper.userToken()
+
     await api
       .put(`/api/books/${booksAtStart[0].id}`)
+      .set('Authorization', `Bearer ${token}`)
       .send(updatedBookInfo)
       .expect(400)
 
