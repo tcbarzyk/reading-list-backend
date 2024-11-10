@@ -1,11 +1,15 @@
 const config = require('./utils/config')
-const booksRouter = require('./controllers/books')
 const express = require('express')
 const app = express()
+require('express-async-errors')
+const booksRouter = require('./controllers/books')
 const mongoose = require('mongoose')
 const cors = require('cors')
 const morgan = require('morgan')
 const logger = require('./utils/logger')
+const middleware = require('./utils/middleware')
+
+mongoose.set('strictQuery', false)
 
 mongoose.connect(config.MONGODB_URI)
   .then(() => {
@@ -20,5 +24,8 @@ app.use(express.json())
 app.use(morgan('tiny'))
 
 app.use('/api/books', booksRouter)
+
+app.use(middleware.unknownEndpoint)
+app.use(middleware.errorHandler)
 
 module.exports = app
