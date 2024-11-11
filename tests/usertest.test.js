@@ -8,7 +8,7 @@ const app = require('../app')
 const api = supertest(app)
 const helper = require('./test_helper')
 
-describe.only('when there is initially one user in db', () => {
+describe('when there is initially one user in db', () => {
   beforeEach(async () => {
     await User.deleteMany({ username: { $ne: 'testuser' } })
   
@@ -19,7 +19,7 @@ describe.only('when there is initially one user in db', () => {
       .send(user)
   })
 
-  test.only('creation succeeds with a fresh username', async () => {
+  test('creation succeeds with a fresh username', async () => {
     const usersAtStart = await helper.usersInDb()
 
     const newUser = {
@@ -41,7 +41,7 @@ describe.only('when there is initially one user in db', () => {
     assert(usernames.includes(newUser.username))
   })
 
-  test.only('creation fails with proper statuscode and message if username already taken', async () => {
+  test('creation fails with proper statuscode and message if username already taken', async () => {
     const usersAtStart = await helper.usersInDb()
 
     const newUser = {
@@ -62,7 +62,7 @@ describe.only('when there is initially one user in db', () => {
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
   })
 
-  test.only('creation fails with proper statuscode and message if email already taken', async () => {
+  test('creation fails with proper statuscode and message if email already taken', async () => {
     const usersAtStart = await helper.usersInDb()
 
     const newUser = {
@@ -83,7 +83,7 @@ describe.only('when there is initially one user in db', () => {
     assert.strictEqual(usersAtEnd.length, usersAtStart.length)
   })
 
-  test.only('creation fails if password is less than 5 characters', async () => {
+  test('creation fails if password is less than 5 characters', async () => {
     const usersAtStart = await helper.usersInDb()
 
     const newUser = {

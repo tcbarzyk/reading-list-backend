@@ -6,16 +6,6 @@ const app = require('../app')
 const api = supertest(app)
 
 const userToken = async () => {
-  /*
-  const newUser = {
-    username: 'tokenuser',
-    email: 'token@gmail.com',
-    password: 'password'
-  }
-
-  await api.post('/api/users').send(newUser)
-
-  const userAuth = await api.post('/login').send( {username: newUser.username, password: newUser.password} )*/
   const userAuth = await api.post('/login').send( {username: 'testuser', password: 'password'} )
   return userAuth.body.token
 }
@@ -29,15 +19,33 @@ const initialBooks = [
   {
     key: "abc123",
     userInfo: {
-      notes: "This is a good book",
-      status: "has read"
+      notes: "This is a not real book",
+      status: "to read"
+    },
+    bookInfo: {
+      title: "A Book",
+      description: "A book about something",
+      author: {
+        key: "49238",
+        name: "John Doe",
+        bio: "He wrote the book"
+      }
     }
   },
   {
     key: "def456",
     userInfo: {
-      notes: "This is not a good book",
+      notes: "This is still not a real book",
       status: "reading"
+    },
+    bookInfo: {
+      title: "A Second Book",
+      description: "A second book about something",
+      author: {
+        key: "5234234",
+        name: "Jane Doe",
+        bio: "She wrote the book"
+      }
     }
   }
 ]

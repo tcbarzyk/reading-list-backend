@@ -72,10 +72,10 @@ describe('viewing a specific book', () => {
   })
 })
 
-describe('creating a new book', () => {
-  test('can create new book', async () => {
+describe.only('creating a new book', () => {
+  test.only('can create new book', async () => {
     const newBook = {
-      key: 'xyz987',
+      key: '/works/OL27448W',
       userInfo: {
         notes: 'This is a weird book',
         status: 'has read'
@@ -94,12 +94,14 @@ describe('creating a new book', () => {
     const booksAtEnd = await helper.booksInDb()
     assert.strictEqual(booksAtEnd.length, helper.initialBooks.length+1)
     const keys = booksAtEnd.map(b => b.key)
-    assert(keys.includes('xyz987'))
+    assert(keys.includes('/works/OL27448W'))
+    const titles = booksAtEnd.map(b => b.bookInfo.title)
+    assert(titles.includes('The Lord of the Rings'))
   })
   
   test('books without status default to reading', async () => {
     const newBook = {
-      key: "ghi567",
+      key: "/works/OL27448W",
       userInfo: {
         notes: 'This book has no status'
       }
@@ -122,7 +124,7 @@ describe('creating a new book', () => {
   
   test('books without userInfo default to empty notes and reading status', async () => {
     const newBook = {
-      key: "ghi567"
+      key: "/works/OL27448W"
     }
 
     const token = await helper.userToken()
@@ -182,8 +184,8 @@ describe('deleting a book', () => {
   })
 })
 
-describe('updating a book', () => {
-  test('can update book using just userinfo', async () => {
+describe.only('updating a book', () => {
+  test.only('can update book using just userinfo', async () => {
     const booksAtStart = await helper.booksInDb()
     const bookToUpdate = booksAtStart[0]
 
@@ -218,6 +220,62 @@ describe('updating a book', () => {
 
     const updatedBookInfo = {
       key: '1234567890'
+    }
+
+    const token = await helper.userToken()
+
+    await api
+      .put(`/api/books/${booksAtStart[0].id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(updatedBookInfo)
+      .expect(400)
+
+    const booksAtEnd = await helper.booksInDb()
+    assert.strictEqual(booksAtEnd.length, booksAtStart.length)
+    
+    const filteredBook = booksAtEnd.find(b => b.id === bookToUpdate.id)
+    assert(filteredBook.key !== updatedBookInfo.key)
+  })
+
+  test.only('can update book using just userinfo', async () => {
+    const booksAtStart = await helper.booksInDb()
+    const bookToUpdate = booksAtStart[0]
+
+    const updatedBookInfo = {
+      userInfo: {
+        notes: 'updated notes on book',
+        status: 'to read'
+      }
+    }
+
+    const token = await helper.userToken()
+
+    await api
+      .put(`/api/books/${booksAtStart[0].id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send(updatedBookInfo)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const booksAtEnd = await helper.booksInDb()
+    assert.strictEqual(booksAtEnd.length, booksAtStart.length)
+    
+    const filteredBook = booksAtEnd.find(b => b.id === bookToUpdate.id)
+    assert(filteredBook.userInfo.status === updatedBookInfo.userInfo.status)
+    assert(filteredBook.userInfo.notes === updatedBookInfo.userInfo.notes)
+    assert(filteredBook.key === booksAtStart[0].key)
+  })
+
+  test('cannot update book with mismatching keys', async () => {
+    const booksAtStart = await helper.booksInDb()
+    const bookToUpdate = booksAtStart[0]
+
+    const updatedBookInfo = {
+      key: '1234567890',
+      userInfo: {
+        notes: 'updated notes on book',
+        status: 'to read'
+      }
     }
 
     const token = await helper.userToken()
