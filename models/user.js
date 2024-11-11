@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
   passwordHash: String,
+  dateCreated: Date,
   books: [
     {
       type: mongoose.Schema.Types.ObjectId,
