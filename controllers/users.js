@@ -30,4 +30,10 @@ usersRouter.get('/', async (request, response) => {
   response.json(users)
 })
 
+usersRouter.get('/:id', async (request, response) => {
+  const user = await User.findById(request.params.id).populate('books', { key: 1, bookInfo: 1, userInfo: 1 })
+  
+  response.json(user)
+})
+
 module.exports = usersRouter
