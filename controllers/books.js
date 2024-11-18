@@ -69,6 +69,11 @@ booksRouter.post('/', async (request, response) => {
     return response.status(400).json({ error: "book or author info not present" })
   }
 
+  const description = 
+      bookInfo.description?.value ||
+      bookInfo.description ||
+      'No description available'
+
   //ensure user info is present
   if (!body.userInfo) {
     body.userInfo = {}
@@ -84,7 +89,8 @@ booksRouter.post('/', async (request, response) => {
     key: body.key,
     bookInfo: {
       title: bookInfo.title,
-      description: bookInfo.description,
+      description: description,
+      coverKey: body.coverKey,
       author: {
         key: authorInfo.key,
         name: authorInfo.name,

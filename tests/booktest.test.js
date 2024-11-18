@@ -98,6 +98,32 @@ describe.only('creating a new book', () => {
     const titles = booksAtEnd.map(b => b.bookInfo.title)
     assert(titles.includes('The Lord of the Rings'))
   })
+
+  test.only('can create new book with description found in description.value', async () => {
+    const newBook = {
+      key: '/works/OL52114W',
+      userInfo: {
+        notes: 'This is a sci fi book',
+        status: 'has read'
+      }
+    }
+
+    const token = await helper.userToken()
+  
+    await api
+      .post('/api/books')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBook)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+    
+    const booksAtEnd = await helper.booksInDb()
+    assert.strictEqual(booksAtEnd.length, helper.initialBooks.length+1)
+    const keys = booksAtEnd.map(b => b.key)
+    assert(keys.includes('/works/OL52114W'))
+    const titles = booksAtEnd.map(b => b.bookInfo.description)
+    assert(titles.includes("The ultimate science fiction classic: for more than one hundred years, this compelling tale of the Martian invasion of Earth has enthralled readers with a combination of imagination and incisive commentary on the imbalance of power that continues to be relevant today. The style is revolutionary for its era, employing a sophisticated first and third person account of the events which is both personal and focused on the holistic downfall of Earth's society. The Martians, as evil, mechanical and unknown a threat they are, remain daunting in today's society, where, despite technology's mammoth advances, humanity's hegemony over Earth is yet to be called into question. In Well's introduction to the book, where the character discusses with the later deceased Ogilvy about astronomy and the possibility of alien life defeating the 'savage' (to them) nineteenth-century Britain, is he insinuating that this is the truth and fate of humanity? It's up to you to decide…"))
+  })
   
   test('books without status default to reading', async () => {
     const newBook = {
