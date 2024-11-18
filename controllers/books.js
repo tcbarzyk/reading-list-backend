@@ -70,9 +70,15 @@ booksRouter.post('/', async (request, response) => {
   }
 
   const description = 
-      bookInfo.description?.value ||
-      bookInfo.description ||
-      'No description available'
+    bookInfo.description?.value ||
+    bookInfo.description ||
+    'No description available'
+
+  const authorBio = 
+    authorInfo.bio?.value ||
+    bookInfo.bio ||
+    'No bio available'
+
 
   //ensure user info is present
   if (!body.userInfo) {
@@ -94,7 +100,7 @@ booksRouter.post('/', async (request, response) => {
       author: {
         key: authorInfo.key,
         name: authorInfo.name,
-        bio: authorInfo.bio
+        bio: authorBio
       }
     },
     userInfo: {
@@ -141,8 +147,16 @@ booksRouter.put('/:id', async (request, response) => {
     return response.status(400).json({ error: "mismatched keys!" })
   }
 
-  if (!body.userInfo || !body.userInfo.status || !body.userInfo.notes) {
+  if (!body.userInfo) {
     return response.status(400).json( {error: "cannot update without userinfo"} )
+  }
+
+  if (!body.userInfo.status) {
+    body.userInfo.status = oldBook.userInfo.status
+  }
+
+  if (!body.userInfo.notes) {
+    body.userInfo.notes = oldBook.userInfo.notes
   }
 
   const newBook = {
